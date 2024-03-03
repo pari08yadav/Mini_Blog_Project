@@ -1,0 +1,13 @@
+body{
+    background-color: #646363;
+    color: antiquewhite;
+}
+
+.jumbo-color{
+    background-color: rgb(61, 59, 66);
+}
+
+.success{
+    color: rgb(255, 55, 0);
+}
+
