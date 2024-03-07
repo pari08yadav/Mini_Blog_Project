@@ -71,9 +71,10 @@ def dashboard(request):
         user = request.user
         full_name = user.get_full_name()
         group = user.groups.all()
+        ip = request.session.get('ip', 0)
         return render(request, 'blog/dashboard.html', 
                     {'posts':posts, 'username':request.user,
-                    'full_name':full_name, 'groups':group})
+                    'full_name':full_name, 'groups':group, 'ip':ip})
     else:
         messages.info(request, "You Are Not Logged In, please Do Login First!!")
         return HttpResponseRedirect('/blog/login')
@@ -106,14 +107,15 @@ def signup(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             uname = form.cleaned_data['username']
-            messages.success(request, f"Welcome {uname} you are logged in successfully" )
+            messages.success(request, f"Welcome {uname} Your SignUp is done successfully" )
             user = form.save()  
             group = Group.objects.get(name='Author')
             user.groups.add(group)
-            return HttpResponseRedirect('/blog/')
+            form = SignUpForm()
+    
     else:
         form = SignUpForm()
-        return render(request, 'blog/signup.html', {'form':form})
+    return render(request, 'blog/signup.html', {'form':form})
 
 
 
