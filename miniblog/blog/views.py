@@ -4,6 +4,7 @@ from django.contrib import messages
 from .forms import SignUpForm, LoginForm, PostForm
 from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.core.cache import cache
 
 # Create your views here.
 
@@ -65,6 +66,7 @@ def delete_post(request, id):
     else:
         return HttpResponseRedirect('/blog/login')
 
+
 def dashboard(request):
     if request.user.is_authenticated:
         posts = post.objects.all()
@@ -72,9 +74,13 @@ def dashboard(request):
         full_name = user.get_full_name()
         group = user.groups.all()
         ip = request.session.get('ip', 0)
+        count = cache.get('count', 0, version=user.pk)
         return render(request, 'blog/dashboard.html', 
-                    {'posts':posts, 'username':request.user,
-                    'full_name':full_name, 'groups':group, 'ip':ip})
+                    {
+                        'posts':posts, 'username':request.user,
+                        'full_name':full_name, 'groups':group, 'ip':ip,
+                        'count':count
+                    })
     else:
         messages.info(request, "You Are Not Logged In, please Do Login First!!")
         return HttpResponseRedirect('/blog/login')
@@ -93,7 +99,6 @@ def user_login(request):
                     login(request, user)
                     messages.success(request, f"Welcome {uname} you are logged in successfully" )
                     return HttpResponseRedirect('/blog/dashboard/')
-                
         else:
             form = LoginForm()
         return render(request, 'blog/login.html', {'form':form})
